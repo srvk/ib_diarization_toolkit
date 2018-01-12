@@ -5,21 +5,34 @@
 # (also known as ib_diarization_toolkit) to produce RTTM clustered
 # utterances and generated speaker IDs
 
-#Needs to be parameterized to take another argument which is for
-# now hard coded as "test2.scp" 
+# Assumes 10ms frame size in .scp file; to change, edit line in htkconfig:
+#   TARGETRATE = 100000.0
 
-# Needs to save results to a named folder, not hard coded diartk_output/diartk_result*
 
-workdir=diartk_output
+numargs=3
+if [ $# -lt $numargs ]; then
+    echo "Usage: run.sh ipfile scpfile outdir"
+    echo ""
+    echo "ipfile :  Audio input file in WAV format, extension .wav"
+    echo "scpfile:  speech/nonspeech file, format:"
+    echo "          segment_name=file_name[start_frame,end_frame]"
+    echo "produces output in folder outdir/"
+    exit
+fi
+
+filename=$(basename "$1")
+basename="${filename%.*}"
+
+workdir=$3
 
 mkdir -p $workdir
 
 # first generate HTK features
-HCopy -T 2 -C htkconfig $1 $workdir/diartk.fea
+HCopy -T 2 -C htkconfig $1 $workdir/$basename.fea
 
 # next run DiarTK
-scripts/run.diarizeme.sh $workdir/diartk.fea test2.scp $workdir diartk_result
+scripts/run.diarizeme.sh $workdir/$basename.fea $2 $workdir $basename
 
 # print results
-cat $workdir/diartk_result.out
+cat $workdir/$basename.out
 
