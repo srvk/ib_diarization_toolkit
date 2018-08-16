@@ -36,9 +36,9 @@ scpfile=$workdir/$basename.scp
 # RTTM format:
 #   Type file chan tbeg tdur ortho stype name conf Slat
 # math: convert RTTM seconds to HTK (10ms default) frames = multiply by 100
-grep LEXEME $2 | awk -v base="$basename" -v feats="$featfile" '{begg=$4*100;endd=($4+$5)*100; print base "_" begg "_" endd "="feats "[" begg "," endd "]"}' > $scpfile
+# assume we process every line in RTTM, don't look for standard symbols in certain columns
+cat $2 | awk -v base="$basename" -v feats="$featfile" '{begg=$4*100;endd=($4+$5)*100; print base "_" begg "_" endd "="feats "[" begg "," endd "]"}' > $scpfile
 
-exit
 # first generate HTK features
 HCopy -T 2 -C htkconfig $1 $featfile
 
